@@ -1,0 +1,280 @@
+{
+  "familyName": "刘氏家族",
+  "familyTree": {
+    "root": "person_001",
+    "persons": [
+      {
+        "id": "person_001",
+        "name": "刘德财",
+        "gender": "male",
+        "birth": "1940-03-15",
+        "death": "2010-11-20",
+        "generation": 1,
+        "photo": "",
+        "isRoot": true,
+        "spouse": ["person_002"],
+        "children": ["person_003", "person_004"],
+        "bio": "家族第一代，白手起家，创立刘氏家业"
+      },
+      {
+        "id": "person_002",
+        "name": "王秀英",
+        "gender": "female",
+        "birth": "1942-07-08",
+        "death": "",
+        "generation": 1,
+        "photo": "",
+        "isRoot": false,
+        "spouse": ["person_001"],
+        "children": ["person_003", "person_004"],
+        "bio": "刘德财之妻，操持家务，养育子女"
+      },
+      {
+        "id": "person_003",
+        "name": "刘大海",
+        "gender": "male",
+        "birth": "1965-01-20",
+        "death": "",
+        "generation": 2,
+        "photo": "",
+        "isRoot": false,
+        "spouse": ["person_006"],
+        "children": ["person_005"],
+        "bio": "刘家长子，继承家业"
+      },
+      {
+        "id": "person_004",
+        "name": "刘大山",
+        "gender": "male",
+        "birth": "1968-05-12",
+        "death": "",
+        "generation": 2,
+        "photo": "",
+        "isRoot": false,
+        "spouse": ["person_007"],
+        "children": ["person_008", "person_009"],
+        "bio": "刘家次子，在外地工作"
+      },
+      {
+        "id": "person_005",
+        "name": "刘能",
+        "gender": "male",
+        "birth": "1990-09-25",
+        "death": "",
+        "generation": 3,
+        "photo": "",
+        "isRoot": false,
+        "spouse": ["person_010"],
+        "children": [],
+        "bio": "刘大海之子，堂哥"
+      },
+      {
+        "id": "person_006",
+        "name": "赵芳",
+        "gender": "female",
+        "birth": "1967-03-18",
+        "death": "",
+        "generation": 2,
+        "photo": "",
+        "isRoot": false,
+        "spouse": ["person_003"],
+        "children": ["person_005"],
+        "bio": "刘大海之妻"
+      },
+      {
+        "id": "person_007",
+        "name": "李红",
+        "gender": "female",
+        "birth": "1970-11-05",
+        "death": "",
+        "generation": 2,
+        "photo": "",
+        "isRoot": false,
+        "spouse": ["person_004"],
+        "children": ["person_008", "person_009"],
+        "bio": "刘大山之妻"
+      },
+      {
+        "id": "person_008",
+        "name": "刘建国",
+        "gender": "male",
+        "birth": "1992-10-01",
+        "death": "",
+        "generation": 3,
+        "photo": "",
+        "isRoot": false,
+        "spouse": [],
+        "children": [],
+        "bio": "刘大山长子"
+      },
+      {
+        "id": "person_009",
+        "name": "刘建民",
+        "gender": "male",
+        "birth": "1995-06-15",
+        "death": "",
+        "generation": 3,
+        "photo": "",
+        "isRoot": false,
+        "spouse": [],
+        "children": [],
+        "bio": "刘大山次子"
+      },
+      {
+        "id": "person_010",
+        "name": "张丽",
+        "gender": "female",
+        "birth": "1992-04-22",
+        "death": "",
+        "generation": 3,
+        "photo": "",
+        "isRoot": false,
+        "spouse": ["person_005"],
+        "children": [],
+        "bio": "刘能之妻"
+      }
+    ]
+  },
+  "familyEvents": [
+    {
+      "id": "event_001",
+      "title": "刘德财与王秀英结婚",
+      "date": "1963-10-01",
+      "category": "家族历史",
+      "description": "刘德财与王秀英在老家举办婚礼，亲朋好友齐聚一堂，见证两人的幸福时刻。",
+      "photos": []
+    },
+    {
+      "id": "event_002",
+      "title": "刘大海出生",
+      "date": "1965-01-20",
+      "category": "族人动态",
+      "description": "刘家长子刘大海出生，全家欢喜，爷爷刘德财亲自取名。",
+      "photos": []
+    },
+    {
+      "id": "event_003",
+      "title": "刘大山出生",
+      "date": "1968-05-12",
+      "category": "族人动态",
+      "description": "刘家次子刘大山出生，两子成双，家庭美满。",
+      "photos": []
+    },
+    {
+      "id": "event_004",
+      "title": "刘大海与赵芳结婚",
+      "date": "1988-09-25",
+      "category": "家族历史",
+      "description": "刘大海与赵芳结婚，组建新的家庭，开始新生活。",
+      "photos": []
+    },
+    {
+      "id": "event_005",
+      "title": "刘能出生",
+      "date": "1990-09-25",
+      "category": "族人动态",
+      "description": "刘大海与赵芳之子刘能出生，恰巧与父亲同一天生日。",
+      "photos": []
+    },
+    {
+      "id": "event_006",
+      "title": "刘大山与李红结婚",
+      "date": "1991-02-14",
+      "category": "家族历史",
+      "description": "情人节这天，刘大山与李红登记结婚，喜结良缘。",
+      "photos": []
+    },
+    {
+      "id": "event_007",
+      "title": "刘建国出生",
+      "date": "1992-10-01",
+      "category": "族人动态",
+      "description": "国庆节，刘大山家喜添长子刘建国。",
+      "photos": []
+    },
+    {
+      "id": "event_008",
+      "title": "刘建民出生",
+      "date": "1995-06-15",
+      "category": "族人动态",
+      "description": "刘大山次子刘建民出生，兄弟二人相差三岁。",
+      "photos": []
+    },
+    {
+      "id": "event_009",
+      "title": "刘能与张丽结婚",
+      "date": "2017-09-25",
+      "category": "家族历史",
+      "description": "堂哥刘能与张丽在老家举办婚礼，婚礼很隆重，全家人都去了，场面热闹非凡。",
+      "photos": []
+    },
+    {
+      "id": "event_010",
+      "title": "姥姥去世",
+      "date": "2015-01-10",
+      "category": "家族历史",
+      "description": "姥姥因病去世，享年73岁，全家人悲痛万分。",
+      "photos": []
+    },
+    {
+      "id": "event_011",
+      "title": "姥爷去世",
+      "date": "2015-10-12",
+      "category": "家族历史",
+      "description": "姥爷去世，享年75岁，与姥姥同年离世，相隔仅9个月。",
+      "photos": []
+    },
+    {
+      "id": "event_012",
+      "title": "刘氏家族团聚",
+      "date": "2024-02-10",
+      "category": "家族历史",
+      "description": "甲辰龙年春节，刘氏家族三代同堂，齐聚一堂共度新春。",
+      "photos": []
+    }
+  ],
+  "aiMessages": [
+    {
+      "id": "msg_001",
+      "sender": "ai",
+      "content": "您好！我是族谱小助手，有什么可以帮您记录的吗？",
+      "time": "2026-06-15T10:00:00Z"
+    },
+    {
+      "id": "msg_002",
+      "sender": "user",
+      "content": "记录家族大事：堂哥刘能结婚",
+      "time": "2026-06-15T10:01:00Z"
+    },
+    {
+      "id": "msg_003",
+      "sender": "ai",
+      "content": "好的！我来帮您记录堂哥刘能结婚这件大事。请问婚礼是什么时候举办的呢？",
+      "time": "2026-06-15T10:01:30Z"
+    },
+    {
+      "id": "msg_004",
+      "sender": "user",
+      "content": "2017年9月25日",
+      "time": "2026-06-15T10:02:00Z"
+    },
+    {
+      "id": "msg_005",
+      "sender": "ai",
+      "content": "收到！2017年9月25日，刘能结婚。请问还有其他细节想补充的吗？比如婚礼地点、嘉宾等。您也可以上传婚礼照片哦！",
+      "time": "2026-06-15T10:02:30Z"
+    },
+    {
+      "id": "msg_006",
+      "sender": "user",
+      "content": "在老家举办的，媳妇叫张丽，长得可漂亮了，婚礼很隆重，全家人都去了",
+      "time": "2026-06-15T10:03:00Z"
+    },
+    {
+      "id": "msg_007",
+      "sender": "ai",
+      "content": "太好了！已为您记录：\n📝 堂哥结婚\n📅 2017年9月25日\n📄 刘能与张丽在老家举办婚礼，婚礼隆重，全家出席。\n\n还有要补充的吗？",
+      "time": "2026-06-15T10:03:30Z"
+    }
+  ]
+}

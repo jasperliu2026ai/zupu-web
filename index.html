@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>刘氏家族谱</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; max-width: 414px; margin: 0 auto; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #8b4513 0%, #d2691e 100%); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
+.header h1 { font-size: 20px; font-weight: 600; }
+.tabs { display: flex; background: white; border-bottom: 1px solid #e0e0e0; }
+.tab { flex: 1; padding: 12px; text-align: center; font-size: 14px; cursor: pointer; transition: all 0.3s; border-bottom: 2px solid transparent; }
+.tab.active { color: #8b4513; border-bottom-color: #8b4513; font-weight: 600; }
+.content { padding: 16px; min-height: calc(100vh - 140px); }
+.page { display: none; }
+.page.active { display: block; }
+
+/* Family Tree */
+.tree-container { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.tree-node { display: flex; justify-content: center; margin-bottom: 20px; }
+.person-card { background: linear-gradient(135deg, #fff8dc 0%, #faebd7 100%); border: 2px solid #8b4513; border-radius: 8px; padding: 12px 20px; text-align: center; min-width: 80px; cursor: pointer; transition: all 0.3s; }
+.person-card:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,69,19,0.3); }
+.person-card.male { border-left: 4px solid #4169e1; }
+.person-card.female { border-left: 4px solid #ff69b4; }
+.person-name { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 4px; }
+.person-gen { font-size: 11px; color: #666; }
+.tree-level { display: flex; justify-content: space-around; margin-bottom: 30px; position: relative; }
+.tree-connector { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 2px; height: 15px; background: #8b4513; }
+
+/* Members */
+.member-list { display: flex; flex-direction: column; gap: 12px; }
+.member-item { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; }
+.member-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.member-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #8b4513 0%, #d2691e 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 600; margin-bottom: 10px; }
+.member-info h3 { font-size: 16px; color: #333; margin-bottom: 4px; }
+.member-info p { font-size: 13px; color: #666; }
+
+/* Timeline */
+.timeline-filters { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
+.filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid #8b4513; background: white; color: #8b4513; font-size: 13px; cursor: pointer; white-space: nowrap; transition: all 0.3s; }
+.filter-btn.active { background: #8b4513; color: white; }
+.timeline-list { display: flex; flex-direction: column; gap: 16px; }
+.event-card { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.event-date { font-size: 12px; color: #8b4513; font-weight: 600; margin-bottom: 8px; }
+.event-title { font-size: 16px; color: #333; font-weight: 600; margin-bottom: 8px; }
+.event-desc { font-size: 14px; color: #666; line-height: 1.6; }
+.event-category { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; margin-top: 8px; }
+.event-category.history { background: #fff3cd; color: #856404; }
+.event-category.news { background: #d1ecf1; color: #0c5460; }
+
+/* AI Chat */
+.chat-container { background: white; border-radius: 12px; padding: 16px; height: calc(100vh - 280px); display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 12px; }
+.message { margin-bottom: 16px; display: flex; }
+.message.ai { justify-content: flex-start; }
+.message.user { justify-content: flex-end; }
+.message-bubble { max-width: 75%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.6; }
+.message.ai .message-bubble { background: #f0f0f0; color: #333; border-bottom-left-radius: 4px; }
+.message.user .message-bubble { background: #8b4513; color: white; border-bottom-right-radius: 4px; }
+.chat-input { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #e0e0e0; }
+.chat-input input { flex: 1; padding: 10px 16px; border: 1px solid #ddd; border-radius: 20px; font-size: 14px; outline: none; }
+.chat-input button { padding: 10px 20px; background: #8b4513; color: white; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; }
+
+/* Modal */
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+.modal.show { display: flex; }
+.modal-content { background: white; border-radius: 16px; padding: 24px; max-width: 360px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.modal-header h2 { font-size: 18px; color: #333; }
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+.modal-body { font-size: 14px; color: #666; line-height: 1.8; }
+.info-row { margin-bottom: 12px; }
+.info-label { font-size: 12px; color: #999; margin-bottom: 4px; }
+.info-value { font-size: 14px; color: #333; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>刘氏家族谱</h1>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-page="tree">族谱树</div>
+  <div class="tab" data-page="members">族人录</div>
+  <div class="tab" data-page="timeline">大事记</div>
+  <div class="tab" data-page="ai">AI助手</div>
+</div>
+
+<div class="content">
+  <!-- 族谱树 -->
+  <div id="tree" class="page active">
+    <div class="tree-container">
+      <h3 style="text-align:center; color:#8b4513; margin-bottom:20px;">家族谱系</h3>
+      <div id="tree-view"></div>
+    </div>
+  </div>
+
+  <!-- 族人录 -->
+  <div id="members" class="page">
+    <div class="member-list" id="member-list"></div>
+  </div>
+
+  <!-- 大事记 -->
+  <div id="timeline" class="page">
+    <div class="timeline-filters">
+      <button class="filter-btn active" data-category="all">全部</button>
+      <button class="filter-btn" data-category="家族历史">家族历史</button>
+      <button class="filter-btn" data-category="族人动态">族人动态</button>
+    </div>
+    <div class="timeline-list" id="timeline-list"></div>
+  </div>
+
+  <!-- AI助手 -->
+  <div id="ai" class="page">
+    <div class="chat-container">
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input">
+        <input type="text" id="chat-input" placeholder="输入消息...">
+        <button onclick="sendMessage()">发送</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal" id="detail-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modal-title">详情</h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+let familyData = null;
+
+// 加载数据
+fetch('data.json')
+  .then(res => res.json())
+  .then(data => {
+    familyData = data;
+    renderTree();
+    renderMembers();
+    renderTimeline('all');
+    renderChat();
+  });
+
+// Tab切换
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.page).classList.add('active');
+  });
+});
+
+// 渲染族谱树
+function renderTree() {
+  const container = document.getElementById('tree-view');
+  const persons = familyData.familyTree.persons;
+  
+  // 按世代分组
+  const generations = {};
+  persons.forEach(p => {
+    if (!generations[p.generation]) generations[p.generation] = [];
+    generations[p.generation].push(p);
+  });
+
+  let html = '';
+  Object.keys(generations).sort().forEach(gen => {
+    html += `<div class="tree-level">`;
+    generations[gen].forEach(person => {
+      const genderClass = person.gender === 'male' ? 'male' : 'female';
+      html += `
+        <div class="person-card ${genderClass}" onclick="showPersonDetail('${person.id}')">
+          <div class="person-name">${person.name}</div>
+          <div class="person-gen">第${gen}代</div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+// 显示人物详情
+function showPersonDetail(personId) {
+  const person = familyData.familyTree.persons.find(p => p.id === personId);
+  if (!person) return;
+
+  const spouse = person.spouse.length > 0 
+    ? familyData.familyTree.persons.filter(p => person.spouse.includes(p.id)).map(p => p.name).join('、')
+    : '无';
+  const children = person.children.length > 0
+    ? familyData.familyTree.persons.filter(p => person.children.includes(p.id)).map(p => p.name).join('、')
+    : '无';
+
+  document.getElementById('modal-title').textContent = person.name;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="info-row">
+      <div class="info-label">性别</div>
+      <div class="info-value">${person.gender === 'male' ? '男' : '女'}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">出生日期</div>
+      <div class="info-value">${person.birth}</div>
+    </div>
+    ${person.death ? `<div class="info-row"><div class="info-label">去世日期</div><div class="info-value">${person.death}</div></div>` : ''}
+    <div class="info-row">
+      <div class="info-label">世代</div>
+      <div class="info-value">第${person.generation}代</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">配偶</div>
+      <div class="info-value">${spouse}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">子女</div>
+      <div class="info-value">${children}</div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">简介</div>
+      <div class="info-value">${person.bio}</div>
+    </div>
+  `;
+  document.getElementById('detail-modal').classList.add('show');
+}
+
+// 渲染族人录
+function renderMembers() {
+  const container = document.getElementById('member-list');
+  const persons = familyData.familyTree.persons;
+  
+  let html = '';
+  persons.forEach(person => {
+    const initial = person.name.charAt(0);
+    const genderIcon = person.gender === 'male' ? '👨' : '👩';
+    html += `
+      <div class="member-item" onclick="showPersonDetail('${person.id}')">
+        <div class="member-avatar">${initial}</div>
+        <div class="member-info">
+          <h3>${person.name} ${genderIcon}</h3>
+          <p>第${person.generation}代 · ${person.birth}</p>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+// 渲染大事记
+function renderTimeline(category) {
+  const container = document.getElementById('timeline-list');
+  let events = familyData.familyEvents;
+  
+  if (category !== 'all') {
+    events = events.filter(e => e.category === category);
+  }
+
+  // 按日期倒序
+  events.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  let html = '';
+  events.forEach(event => {
+    const dateObj = new Date(event.date);
+    const year = dateObj.getFullYear();
+    const month = dateObj.getMonth() + 1;
+    const day = dateObj.getDate();
+    const categoryClass = event.category === '家族历史' ? 'history' : 'news';
+    
+    html += `
+      <div class="event-card">
+        <div class="event-date">📅 ${year}年${month}月${day}日</div>
+        <div class="event-title">${event.title}</div>
+        <div class="event-desc">${event.description}</div>
+        <span class="event-category ${categoryClass}">${event.category}</span>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+// 筛选按钮
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTimeline(btn.dataset.category);
+  });
+});
+
+// 渲染聊天
+function renderChat() {
+  const container = document.getElementById('chat-messages');
+  let html = '';
+  familyData.aiMessages.forEach(msg => {
+    html += `
+      <div class="message ${msg.sender}">
+        <div class="message-bubble">${msg.content.replace(/\n/g, '<br>')}</div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+  container.scrollTop = container.scrollHeight;
+}
+
+// 发送消息
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  // 添加用户消息
+  familyData.aiMessages.push({
+    id: 'msg_' + Date.now(),
+    sender: 'user',
+    content: text,
+    time: new Date().toISOString()
+  });
+
+  input.value = '';
+  renderChat();
+
+  // 模拟AI回复
+  setTimeout(() => {
+    const responses = [
+      '好的，我已记录。还有其他家族大事要补充吗？',
+      '收到！请问这件事发生在什么时候呢？',
+      '太好了！已为您记录这件家族大事。',
+      '明白了，还有什么细节想补充吗？',
+      '好的，我已将这条信息添加到家族记录中。'
+    ];
+    const reply = responses[Math.floor(Math.random() * responses.length)];
+    
+    familyData.aiMessages.push({
+      id: 'msg_' + Date.now(),
+      sender: 'ai',
+      content: reply,
+      time: new Date().toISOString()
+    });
+    renderChat();
+  }, 1000);
+}
+
+// 回车发送
+document.getElementById('chat-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+// 关闭弹窗
+function closeModal() {
+  document.getElementById('detail-modal').classList.remove('show');
+}
+
+// 点击弹窗外部关闭
+document.getElementById('detail-modal').addEventListener('click', e => {
+  if (e.target.id === 'detail-modal') closeModal();
+});
+</script>
+
+</body>
+</html>
