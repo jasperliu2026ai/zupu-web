@@ -66,6 +66,34 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
 .modal.show { display: flex; }
 .modal-content { background: white; border-radius: 16px; padding: 24px; max-width: 360px; width: 90%; max-height: 80vh; overflow-y: auto; }
+
+/* Admin */
+.admin-panel { padding: 4px 0; }
+.admin-section { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.admin-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.admin-section-header h4 { font-size: 15px; color: #333; }
+.btn-add { padding: 6px 14px; background: #8b4513; color: white; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; }
+.btn-export, .btn-import, .btn-reset { padding: 10px 16px; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 500; }
+.btn-export { background: #28a745; color: white; }
+.btn-import { background: #17a2b8; color: white; display: inline-block; }
+.btn-reset { background: #dc3545; color: white; }
+.admin-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+.admin-item:last-child { border-bottom: none; }
+.admin-item-info { flex: 1; }
+.admin-item-info h5 { font-size: 14px; color: #333; margin-bottom: 2px; }
+.admin-item-info p { font-size: 12px; color: #999; }
+.admin-item-actions { display: flex; gap: 6px; }
+.btn-edit { padding: 4px 10px; background: #ffc107; color: #333; border: none; border-radius: 6px; font-size: 11px; cursor: pointer; }
+.btn-del { padding: 4px 10px; background: #dc3545; color: white; border: none; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+/* Form Modal */
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
+.form-group textarea { height: 80px; resize: vertical; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #8b4513; }
+.btn-save { width: 100%; padding: 12px; background: #8b4513; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+.btn-cancel { width: 100%; padding: 12px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; margin-top: 6px; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .modal-header h2 { font-size: 18px; color: #333; }
 .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
@@ -86,6 +114,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft
   <div class="tab" data-page="members">族人录</div>
   <div class="tab" data-page="timeline">大事记</div>
   <div class="tab" data-page="ai">AI助手</div>
+  <div class="tab" data-page="admin">管理</div>
 </div>
 
 <div class="content">
@@ -110,6 +139,47 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft
       <button class="filter-btn" data-category="族人动态">族人动态</button>
     </div>
     <div class="timeline-list" id="timeline-list"></div>
+  </div>
+
+  <!-- 管理后台 -->
+  <div id="admin" class="page">
+    <div class="admin-panel">
+      <!-- 管理员标题 -->
+      <h3 style="color:#8b4513; margin-bottom:16px;">📋 管理后台</h3>
+
+      <!-- 成员管理 -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h4>👥 成员管理</h4>
+          <button class="btn-add" onclick="showAddMember()">+ 添加成员</button>
+        </div>
+        <div id="admin-members-list"></div>
+      </div>
+
+      <!-- 大事记管理 -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h4>📅 大事记管理</h4>
+          <button class="btn-add" onclick="showAddEvent()">+ 添加大事记</button>
+        </div>
+        <div id="admin-events-list"></div>
+      </div>
+
+      <!-- 数据操作 -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h4>💾 数据操作</h4>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-export" onclick="exportData()">⬇️ 导出 data.json</button>
+          <label class="btn-import" style="cursor:pointer;">
+            📥 导入 data.json
+            <input type="file" accept=".json" onchange="importData(event)" style="display:none;">
+          </label>
+          <button class="btn-reset" onclick="resetData()">🗑️ 重置数据</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- AI助手 -->
@@ -142,11 +212,18 @@ let familyData = null;
 fetch('data.json')
   .then(res => res.json())
   .then(data => {
-    familyData = data;
+    // 优先使用 localStorage 中的修改
+    const local = localStorage.getItem('zupuData');
+    if (local) {
+      try { familyData = JSON.parse(local); } catch(e) { familyData = data; }
+    } else {
+      familyData = data;
+    }
     renderTree();
     renderMembers();
     renderTimeline('all');
     renderChat();
+    renderAdmin();
   });
 
 // Tab切换
@@ -156,6 +233,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById(tab.dataset.page).classList.add('active');
+    if (tab.dataset.page === 'admin') renderAdmin();
   });
 });
 
@@ -307,6 +385,254 @@ function renderChat() {
   });
   container.innerHTML = html;
   container.scrollTop = container.scrollHeight;
+}
+
+// ==================== 管理后台 ====================
+function renderAdmin() {
+  renderAdminMembers();
+  renderAdminEvents();
+}
+
+function renderAdminMembers() {
+  const container = document.getElementById('admin-members-list');
+  if (!container) return;
+  let html = '';
+  familyData.familyTree.persons.forEach(person => {
+    html += `
+      <div class="admin-item">
+        <div class="admin-item-info">
+          <h5>${person.name}</h5>
+          <p>第${person.generation}代 · ${person.gender === 'male' ? '男' : '女'} · ${person.birth}</p>
+        </div>
+        <div class="admin-item-actions">
+          <button class="btn-edit" onclick="editMember('${person.id}')">编辑</button>
+          <button class="btn-del" onclick="deleteMember('${person.id}')">删除</button>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function renderAdminEvents() {
+  const container = document.getElementById('admin-events-list');
+  if (!container) return;
+  let html = '';
+  familyData.familyEvents.forEach(event => {
+    html += `
+      <div class="admin-item">
+        <div class="admin-item-info">
+          <h5>${event.title}</h5>
+          <p>${event.date} · ${event.category}</p>
+        </div>
+        <div class="admin-item-actions">
+          <button class="btn-edit" onclick="editEvent('${event.id}')">编辑</button>
+          <button class="btn-del" onclick="deleteEvent('${event.id}')">删除</button>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+// 成员表单
+function showAddMember() {
+  showMemberForm(null);
+}
+
+function editMember(id) {
+  const person = familyData.familyTree.persons.find(p => p.id === id);
+  showMemberForm(person);
+}
+
+function showMemberForm(person) {
+  const isEdit = person !== null;
+  const title = isEdit ? '编辑成员' : '添加成员';
+  const p = person || { id: '', name: '', gender: 'male', birth: '', death: '', generation: 1, photo: '', isRoot: false, spouse: [], children: [], bio: '' };
+  
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = `
+    <form id="member-form">
+      <div class="form-group">
+        <label>姓名 *</label>
+        <input type="text" id="f-name" value="${p.name}" required>
+      </div>
+      <div class="form-group">
+        <label>性别</label>
+        <select id="f-gender">
+          <option value="male" ${p.gender==='male'?'selected':''}>男</option>
+          <option value="female" ${p.gender==='female'?'selected':''}>女</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>出生日期</label>
+        <input type="date" id="f-birth" value="${p.birth}">
+      </div>
+      <div class="form-group">
+        <label>去世日期</label>
+        <input type="date" id="f-death" value="${p.death}">
+      </div>
+      <div class="form-group">
+        <label>世代</label>
+        <input type="number" id="f-gen" value="${p.generation}" min="1">
+      </div>
+      <div class="form-group">
+        <label>简介</label>
+        <textarea id="f-bio">${p.bio}</textarea>
+      </div>
+      <button type="submit" class="btn-save">${isEdit ? '保存修改' : '添加成员'}</button>
+      <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
+    </form>
+  `;
+  document.getElementById('detail-modal').classList.add('show');
+
+  document.getElementById('member-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const data = {
+      id: isEdit ? p.id : 'person_' + Date.now(),
+      name: document.getElementById('f-name').value,
+      gender: document.getElementById('f-gender').value,
+      birth: document.getElementById('f-birth').value,
+      death: document.getElementById('f-death').value,
+      generation: parseInt(document.getElementById('f-gen').value) || 1,
+      photo: p.photo,
+      isRoot: p.isRoot,
+      spouse: p.spouse,
+      children: p.children,
+      bio: document.getElementById('f-bio').value
+    };
+
+    if (isEdit) {
+      const idx = familyData.familyTree.persons.findIndex(x => x.id === p.id);
+      familyData.familyTree.persons[idx] = data;
+    } else {
+      familyData.familyTree.persons.push(data);
+    }
+    saveAndRefresh();
+  });
+}
+
+function deleteMember(id) {
+  if (!confirm('确定要删除这位成员吗？')) return;
+  familyData.familyTree.persons = familyData.familyTree.persons.filter(p => p.id !== id);
+  saveAndRefresh();
+}
+
+// 事件表单
+function showAddEvent() {
+  showEventForm(null);
+}
+
+function editEvent(id) {
+  const event = familyData.familyEvents.find(e => e.id === id);
+  showEventForm(event);
+}
+
+function showEventForm(event) {
+  const isEdit = event !== null;
+  const title = isEdit ? '编辑大事记' : '添加大事记';
+  const e = event || { id: '', title: '', date: '', category: '族人动态', description: '', photos: [] };
+  
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = `
+    <form id="event-form">
+      <div class="form-group">
+        <label>标题 *</label>
+        <input type="text" id="f-etitle" value="${e.title}" required>
+      </div>
+      <div class="form-group">
+        <label>日期 *</label>
+        <input type="date" id="f-edate" value="${e.date}" required>
+      </div>
+      <div class="form-group">
+        <label>分类</label>
+        <select id="f-ecategory">
+          <option value="家族历史" ${e.category==='家族历史'?'selected':''}>家族历史</option>
+          <option value="族人动态" ${e.category==='族人动态'?'selected':''}>族人动态</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>描述</label>
+        <textarea id="f-edesc">${e.description}</textarea>
+      </div>
+      <button type="submit" class="btn-save">${isEdit ? '保存修改' : '添加大事记'}</button>
+      <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
+    </form>
+  `;
+  document.getElementById('detail-modal').classList.add('show');
+
+  document.getElementById('event-form').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const data = {
+      id: isEdit ? e.id : 'event_' + Date.now(),
+      title: document.getElementById('f-etitle').value,
+      date: document.getElementById('f-edate').value,
+      category: document.getElementById('f-ecategory').value,
+      description: document.getElementById('f-edesc').value,
+      photos: e.photos
+    };
+
+    if (isEdit) {
+      const idx = familyData.familyEvents.findIndex(x => x.id === e.id);
+      familyData.familyEvents[idx] = data;
+    } else {
+      familyData.familyEvents.push(data);
+    }
+    saveAndRefresh();
+  });
+}
+
+function deleteEvent(id) {
+  if (!confirm('确定要删除这条大事记吗？')) return;
+  familyData.familyEvents = familyData.familyEvents.filter(e => e.id !== id);
+  saveAndRefresh();
+}
+
+// 数据操作
+function exportData() {
+  const blob = new Blob([JSON.stringify(familyData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'data.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const newData = JSON.parse(e.target.result);
+      if (newData.familyTree && newData.familyEvents) {
+        familyData = newData;
+        saveAndRefresh();
+        alert('导入成功！');
+      } else {
+        alert('JSON 格式不正确');
+      }
+    } catch (err) {
+      alert('解析失败：' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetData() {
+  if (!confirm('确定要重置所有数据吗？此操作不可恢复！')) return;
+  localStorage.removeItem('zupuData');
+  location.reload();
+}
+
+function saveAndRefresh() {
+  localStorage.setItem('zupuData', JSON.stringify(familyData));
+  closeModal();
+  renderTree();
+  renderMembers();
+  renderTimeline('all');
+  renderAdmin();
 }
 
 // 发送消息
